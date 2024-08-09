@@ -1,0 +1,16 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: wwwcloudstudio
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: slsauctions
+frameworkVersion: ~4.1.0
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  stage: dev
+  region: us-east-1
+
+resources: 
+  Resources:
+    ${file(resources.yml)}
+
