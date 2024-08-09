@@ -1,0 +1,10 @@
+1. sls cli installation
+
+npm install serverless -g
+
+sls -v ( inspect the version)
+
+2. create new sls project
+
+sls 
+
