@@ -14,3 +14,18 @@ booksTable:
     Tags: 
       - Key: Name
         Value: books_table
+
+customerTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    AttributeDefinitions: 
+      - AttributeName: "customerId"
+        AttributeType: "S"
+
+    BillingMode: PAY_PER_REQUEST   
+    KeySchema: 
+      - AttributeName: "customerId"
+        KeyType: "HASH"   
+    Tags: 
+      - Key: Name
+        Value: customer_table
