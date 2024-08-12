@@ -1,0 +1,82 @@
+name: AuctionsApp
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deployBE:
+    name: actions serverless backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./slsAuctions
+    environment:
+      name: test
+      url: https://w3cloudstudio.com
+    strategy:
+      matrix:
+        node-version: [20.x]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm ci     
+    - name: install serverless      
+      uses: serverless/github-action@v3.2     
+      with:
+        args: -c "cd ./slsAuctions && serverless deploy"
+        entrypoint: /bin/sh
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  deployFE:
+    name: ng-auctions frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./ngAuctions
+    environment:
+      name: test
+      url: 'https://w3cloudstudio.com'
+    strategy:
+      matrix:
+        node-version: [20.x]
+    steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - uses: actions/checkout@v4
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm ci     
+
+    - name: Install dependencies
+      run: |          
+          npm install -g @angular/cli 
+          npm install 
+  
+    - name: Build
+      run: ng build
+
+    - name: Deploy
+      if: success()
+      run: aws s3 sync ./dist/ng-auctions/browser s3://ng-auctions
+      
+    - name: Invalidate CloudFront
+      run: |
+          aws cloudfront create-invalidation --distribution-id E1KWUSH3MHP4TR --paths "/*"
+
+
+  
+
