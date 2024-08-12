@@ -70,8 +70,8 @@ jobs:
 
     - name: Copy to S3 Bucket
       run: |
-          aws s3 cp ./dist/ngAuctions/browser/* s3://ng-auctions.s3-website-us-east-1.amazonaws.com
-          
+          aws s3 cp ./dist/ngAuctions/browser/* s3://ng-auctions
+
     - name: Invalidate CloudFront
       run: |
           aws cloudfront create-invalidation --distribution-id E1KWUSH3MHP4TR --paths "/*"
