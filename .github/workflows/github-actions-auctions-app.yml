@@ -24,7 +24,7 @@ jobs:
       run: | 
         # --config wants the serverless files in the root, so I move them there
         echo move configuration file to the root folder
-        mv ./slsAuctions/serverless.yml ./serverless.yml.yml
+        mv slsAuctions/serverless.yml ./serverless.yml
 
     - uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}
