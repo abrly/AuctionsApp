@@ -68,8 +68,10 @@ jobs:
           npm install
           ng build
 
-    - name: Copy to S3 Bucket
-      run: aws s3 cp ./dist/ng-auctions/browser/*  s3://ng-auctions  --region us-east-1
+    - name: s3 sync
+      uses: jakejarvis/s3-sync-action@master
+      with:
+        args: --acl public-read --follow-symlinks --delete
 
     - name: Invalidate CloudFront
       run: |
@@ -77,5 +79,7 @@ jobs:
       env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
+          AWS_S3_BUCKET: "s3://ng-auctions"
+          AWS_REGION: 'us-east-1'   # optional: defaults to us-east-1
+          SOURCE_DIR: 'dist/ng-auctions/browser'      # optional: defaults to entire repository
 
