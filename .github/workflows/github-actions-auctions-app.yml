@@ -68,10 +68,8 @@ jobs:
           npm install
           ng build
 
-    - name: s3 sync step
-      uses: jakejarvis/s3-sync-action@master
-      with:
-        args: --acl public-read --follow-symlinks --delete
+    - name: run s3-sync
+      uses: jakejarvis/s3-sync-action@master      
 
     - name: Invalidate CloudFront
       run: |
