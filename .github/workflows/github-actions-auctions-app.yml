@@ -69,7 +69,7 @@ jobs:
           ng build
 
     - name: Copy to S3 Bucket
-      run: aws s3 cp dist/ng-auctions/browser/  s3://ng-auctions
+      run: aws s3 cp dist/ng-auctions/browser/  s3://ng-auctions --region us-east-1
 
     - name: Invalidate CloudFront
       run: |
