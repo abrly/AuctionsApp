@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./slsAuctions
+        working-directory: ../slsAuctions
     environment:
       name: test
       url: https://w3cloudstudio.com
