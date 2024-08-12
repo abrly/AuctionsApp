@@ -34,8 +34,7 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-  frontenddeploymentjob:
-    name: auctions frontend deployment
+  deployFE:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -47,37 +46,31 @@ jobs:
       matrix:
         node-version: [20.x]
     steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
     - uses: actions/checkout@v4
-    - name: 'Use Node.js ${{ matrix.node-version }}'
+    - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
-        node-version: '${{ matrix.node-version }}'
-    - run: npm ci
-    - name: Setup Cache
-      uses: actions/cache@v4
-      with: 
-        path: ~/.npm
-        key: '${{ runner.os }}-node-${{ hashFiles(''**/package-lock.json'') }}'
-        restore-keys: |
-          ${{ runner.os }}-node-
+        node-version: ${{ matrix.node-version }}
+    - run: npm ci     
 
-    - name: Build Angular Application
-      run: |
-          ls
-          npm install -g @angular/cli
-          npm install
-          ng build
+    - name: Install dependencies
+      run: |          
+          npm install -g @angular/cli 
+          npm install 
+  
+    - name: Build
+      run: ng build
 
-    - name: run s3-sync
-      uses: jakejarvis/s3-sync-action@master      
+    - name: Deploy
+      if: success()
+      run: aws s3 sync ./dist/ng-auctions/browser s3://ng-auctions
 
-    - name: Invalidate CloudFront
-      run: |
-          aws cloudfront create-invalidation --distribution-id E1KWUSH3MHP4TR --paths "/*"
-      env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_S3_BUCKET: ${{ secrets.AWS_NG_AUCTIONS_BUCKET }}
-          AWS_REGION: 'us-east-1'   # optional: defaults to us-east-1
-          SOURCE_DIR: 'dist/ng-auctions/browser'      # optional: defaults to entire repository
+  
 
