@@ -71,6 +71,11 @@ jobs:
     - name: Deploy
       if: success()
       run: aws s3 sync ./dist/ng-auctions/browser s3://ng-auctions
+      
+    - name: Invalidate CloudFront
+      run: |
+          aws cloudfront create-invalidation --distribution-id E1KWUSH3MHP4TR --paths "/*"
+
 
   
 
