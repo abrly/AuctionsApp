@@ -9,6 +9,9 @@ jobs:
   deploy:
     name: auctiondevdeployment
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./slsAuctions
     environment:
       name: test
       url: https://w3cloudstudio.com
@@ -22,8 +25,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci 
-    - name: serverless deploy
-      working-directory: ./slsAuctions
+    - name: serverless deploy      
       uses: serverless/github-action@v3.2
       with:
         args: deploy
