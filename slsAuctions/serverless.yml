@@ -12,7 +12,7 @@ provider:
 
 resources: 
   Resources:
-    ${file(slsResources/cognito.yml)}
+    ${file(slsResources/cognitos.yml)}
     ${file(slsResources/dynamodbs.yml)}
     
 
