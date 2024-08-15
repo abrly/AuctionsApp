@@ -3,6 +3,7 @@ org: wwwcloudstudio
 # "service" is the name of this project. This will also be added to your AWS resource names.
 service: slsauctions
 frameworkVersion: 3.39.0
+#frameworkVersion: 4.1.22
 
 provider:
   name: aws
@@ -12,8 +13,9 @@ provider:
 
 resources: 
   Resources:  
-    - ${file(slsResources/cognitos.yml)}
-    - ${file(slsResources/dynamodbs.yml)}
+    ${file(resources.yml)}
+    #- ${file(slsResources/cognitos.yml)}
+    #- ${file(slsResources/dynamodbs.yml)}
     
 
 plugins:
