@@ -11,9 +11,9 @@ provider:
   region: us-east-1
 
 resources: 
-  Resources:
-    ${file(slsResources/cognitos.yml)}
-    ${file(slsResources/dynamodbs.yml)}
+  Resources:  
+    - ${file(slsResources/cognitos.yml)}
+    - ${file(slsResources/dynamodbs.yml)}
     
 
 plugins:
