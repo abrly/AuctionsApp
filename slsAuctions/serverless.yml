@@ -12,5 +12,47 @@ provider:
 
 resources: 
   Resources:
-    ${file(resources.yml)}
+    ${file(slsResources/cognito.yml)}
+    ${file(slsResources/dynamodbs.yml)}
+    
+
+plugins:
+  - serverless-appsync-plugin
+
+custom:
+  appSync:
+    name:  AuctionsAppSyncAPI
+    authenticationType: AMAZON_COGNITO_USER_POOLS
+
+    userPoolConfig:
+      awsRegion: ${self:provider.region}
+      defaultAction: ALLOW
+      userPoolId: !Ref cognitoUserPool 
+
+    mappingTemplatesLocation: mapping-templates
+    mappingTemplates:
+      - type: Query
+        field: getUser
+        dataSource: userTable
+
+      - type: Mutation
+        field: createUser
+        dataSource: userTable
+
+      - type: Mutation
+        field: createAuction
+        dataSource: auctionTable
+
+    dataSources:
+      - type: AMAZON_DYNAMODB
+
+        name: userTable
+        config: 
+          tableName: !Ref userTable
+
+      - type: AMAZON_DYNAMODB
+
+        name: auctionTable
+        config: 
+          tableName: !Ref auctionTable
 

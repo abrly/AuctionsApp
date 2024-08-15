@@ -28,7 +28,7 @@ jobs:
     - name: install serverless      
       uses: serverless/github-action@v3.2     
       with:
-        args: -c "cd ./slsAuctions && serverless deploy"
+        args: -c "cd ./slsAuctions && serverless plugin install --name serverless-appsync-plugin && serverless deploy"
         entrypoint: /bin/sh
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
