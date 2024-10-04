@@ -1,0 +1,21 @@
+$utils.log.info($utils.toJson($ctx))
+
+#set($pkPrefix = "AUC#")
+#set($pk = $ctx.args.auctionId)
+#set($prefixedPk = "$pkPrefix$pk")
+#set($sk = "#A")
+{
+    "version": "2017-02-28",
+    "operation": "Query",    
+    "query": {
+        "expression": "pk = :pk and sk >= :sk ",
+        "expressionValues": {
+            ":pk": {
+                "S": $util.toJson($prefixedPk)
+            },
+             ":sk": {
+                "S": $util.toJson($sk)
+            }
+        }
+    }
+}

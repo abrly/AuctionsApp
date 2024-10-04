@@ -1,0 +1,71 @@
+
+Designing an auction application using a single DynamoDB table while storing user information requires careful planning around partition keys, sort keys, and efficient access patterns. Here’s a basic schema that can handle different auction-related entities (users, bids, auctions, etc.) in a single table.
+
+### Table Design
+
+| **Primary Key**          | **Attributes**                       |
+|--------------------------|--------------------------------------|
+| `PK` (Partition Key)      | Defines the entity type (`USER#`, `AUCTION#`, `BID#`)|
+| `SK` (Sort Key)           | Helps to sort and differentiate data within an entity |
+| Other Attributes          | Entity-specific attributes (e.g., username, email, bid amount) |
+
+### Example Entities:
+
+1. **User Entity**  
+   - **PK**: `USER#<UserID>`
+   - **SK**: `PROFILE`
+   - Attributes: `Name`, `Email`, `Address`, `CreatedAt`
+
+2. **Auction Entity**  
+   - **PK**: `AUCTION#<AuctionID>`
+   - **SK**: `DETAILS`
+   - Attributes: `Title`, `Description`, `StartDate`, `EndDate`, `StartingPrice`
+
+3. **Bid Entity**  
+   - **PK**: `AUCTION#<AuctionID>`
+   - **SK**: `BID#<BidID>`
+   - Attributes: `BidderID`, `BidAmount`, `BidTime`
+
+### Access Patterns:
+
+1. **Get User Profile:**
+   - **Query**: `PK = USER#<UserID> AND SK = PROFILE`
+   - Retrieve user profile information.
+
+2. **Get Auction Details:**
+   - **Query**: `PK = AUCTION#<AuctionID> AND SK = DETAILS`
+   - Fetch auction details for a specific auction.
+
+3. **Get All Bids for an Auction:**
+   - **Query**: `PK = AUCTION#<AuctionID> AND begins_with(SK, 'BID#')`
+   - Retrieve all bids associated with a specific auction, sorted by bid time.
+
+4. **Get User's Bids:**
+   - **Secondary Index (GSI)**:
+     - **GSI_PK**: `USER#<UserID>`
+     - **GSI_SK**: `AUCTION#<AuctionID>#BID#<BidID>`
+   - Query the index to retrieve all bids by a specific user.
+
+### Sample Data:
+
+1. **User Data:**
+   - **PK**: `USER#123`
+   - **SK**: `PROFILE`
+   - Attributes: `{ Name: 'John Doe', Email: 'john@example.com', Address: '123 Main St', CreatedAt: '2024-01-01' }`
+
+2. **Auction Data:**
+   - **PK**: `AUCTION#987`
+   - **SK**: `DETAILS`
+   - Attributes: `{ Title: 'Vintage Car', Description: 'A classic car auction', StartDate: '2024-09-01', EndDate: '2024-09-10', StartingPrice: 5000 }`
+
+3. **Bid Data:**
+   - **PK**: `AUCTION#987`
+   - **SK**: `BID#001`
+   - Attributes: `{ BidderID: 'USER#123', BidAmount: 5500, BidTime: '2024-09-02T10:00:00' }`
+
+### Benefits of Single Table Design:
+- **Efficient Queries**: All related data (e.g., auction bids) is stored together under a single partition.
+- **Scalability**: DynamoDB's partitioning model allows for seamless scaling as your data grows.
+- **Cost Efficiency**: By using a single table, you minimize read and write throughput across multiple tables.
+
+Would you like more details on implementing this schema, like defining global secondary indexes or managing transactions?

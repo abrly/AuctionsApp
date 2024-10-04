@@ -1,0 +1,33 @@
+#set($updateExpression = "SET ")
+#set($expressionAttributeValues = {})
+#set($expressionAttributeNames = {})
+
+#if($ctx.args.input.auctionTitle)
+    #set($updateExpression = "${updateExpression}#auctionTitle = :auctionTitle")
+    #set($expressionAttributeNames["#auctionTitle"] = "auctionTitle")
+    #set($expressionAttributeValues[":auctionTitle"] = $util.dynamodb.toDynamoDB($ctx.args.input.auctionTitle))
+#end
+
+#if($ctx.args.input.description)
+    #if($ctx.args.input.auctionTitle)
+        #set($updateExpression = "${updateExpression}, ")
+    #end
+    #set($updateExpression = "${updateExpression}#description = :description")
+    #set($expressionAttributeNames["#description"] = "description")
+    #set($expressionAttributeValues[":description"] = $util.dynamodb.toDynamoDB($ctx.args.input.description))
+#end
+
+{
+    "version": "2017-02-28",
+    "operation": "UpdateItem",
+    "key": {
+        "auctionId": {
+            "S": "$ctx.args.auctionId"
+        }
+    },
+    "update": {
+        "expression": "$updateExpression",
+        "expressionNames": $util.toJson($expressionAttributeNames),
+        "expressionValues": $util.toJson($expressionAttributeValues)
+    }
+}

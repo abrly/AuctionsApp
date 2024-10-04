@@ -1,29 +1,24 @@
-# "org" ensures this Service is used with the correct Serverless Framework Access Key.
-org: wwwcloudstudio
-# "service" is the name of this project. This will also be added to your AWS resource names.
-service: slsauctions
-frameworkVersion: 3.39.0
-#frameworkVersion: 4.1.22
+
+service: Auctions
+frameworkVersion: "4"
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs18.x
   stage: dev
   region: us-east-1
 
 resources: 
-  Resources:  
-    ${file(resources.yml)}
-    #- ${file(slsResources/cognitos.yml)}
-    #- ${file(slsResources/dynamodbs.yml)}
-    
+  - ${file(slsResources/cognitos.yml)}
+  - ${file(slsResources/dyn_tables.yml)}
 
 plugins:
   - serverless-appsync-plugin
 
 custom:
   appSync:
-    name:  AuctionsAppSyncAPI
+    name:  AuctionsAppSyncAPI   
+    schema: schema.graphql
     authenticationType: AMAZON_COGNITO_USER_POOLS
 
     userPoolConfig:
@@ -35,26 +30,56 @@ custom:
     mappingTemplates:
       - type: Query
         field: getUser
-        dataSource: userTable
+        dataSource: xAuctionsTable
 
+      - type: Query
+        field: getAuction
+        dataSource: xAuctionsTable
+
+      - type: Query
+        field: listAuctions
+        dataSource: xAuctionsTable
+
+      - type: Query
+        field: getBids
+        dataSource: xAuctionsTable     
+      
       - type: Mutation
-        field: createUser
-        dataSource: userTable
+        field: addUser
+        dataSource: xAuctionsTable
 
       - type: Mutation
         field: createAuction
-        dataSource: auctionTable
+        dataSource: xAuctionsTable
+
+      - type: Mutation
+        field: updateAuction
+        dataSource: xAuctionsTable
+
+      - type: Mutation
+        field: deleteAuction
+        dataSource: xAuctionsTable
+
+      - type: Mutation
+        field: createBid
+        dataSource: xAuctionsTable
+
+      - type: Mutation
+        field: deleteBid
+        dataSource: xAuctionsTable
+
 
     dataSources:
       - type: AMAZON_DYNAMODB
-
-        name: userTable
+        name: xAuctionsTable
         config: 
-          tableName: !Ref userTable
+          tableName: !Ref xAuctionsTable
 
-      - type: AMAZON_DYNAMODB
 
-        name: auctionTable
-        config: 
-          tableName: !Ref auctionTable
+
+
+
+
+
+
 

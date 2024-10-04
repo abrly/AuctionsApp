@@ -1,0 +1,16 @@
+{
+      "statusCode": 200,
+      "message": "success",
+      "result": {
+        "auctionId": $util.toJson($ctx.result.auctionId),
+        "bidId": $util.toJson($ctx.result.bidId), 
+        "bidBy": {          
+           "userId":  $util.toJson($ctx.result.userId),
+           "userName":  $util.toJson($ctx.result.title)
+        },       
+        "bidAmount": $util.toJson($ctx.result.amount),       
+        "createdAt": $util.toJson($ctx.result.createdAt),
+        "updatedAt": $util.toJson($ctx.result.updatedAt)
+    }
+
+}

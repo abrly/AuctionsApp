@@ -1,0 +1,190 @@
+
+Sample Data:
+
+User 
+
+PK                            SK        EntityType     Title     EmailAddress             GSI-1(status)              CreatedOn   UpdatedOn   UserID                 MobileNo    
+
+USR#amjad@yahoo.com      #USRPROFILE#     User             Amjad        amjad@yahoo.com           Active                  2024/9/1    2024/9/1    amjad@yahoo.com       0507877   
+USR#sards@yahoo.com      #USRPROFILE#     User              Sarmad        sards@yahoo.com           Active                  2024/9/1    2024/9/1    sards@yahoo.com       0507877
+
+
+Access Patterns:
+
+1. Add/ Update User (Query: PK = USR#<email> AND SK = #USRPROFILE#)
+
+2. Get User PROFILE
+
+    Query: PK = #USR#<email> AND SK = #USRPROFILE#
+    Retrieve user profile information.
+
+
+4. search users by Status
+
+   
+    GSI
+
+    PK(GSI-1)        
+
+    Active      
+
+    Query: PK = Active   SK= #USRPROFILE#
+
+
+4. search users by Title
+    
+    GSI
+
+    PK(SK)          SK
+
+    #USRPROFILE#   Title
+
+    Query: PK = #USRPROFILE# AND begins_with(SK, 'Amj')
+
+
+
+
+Auctions
+
+PK                SK                Title           Description  GSI-1     GSI-2 (Category)   StartPrice   Amount       UserID     StartDdate  GSI-3(EndDate)     CreatedOn       UpdatedOn
+ 
+AUC#12786786    #AUCPROFILE#     DGW Auction 2024    blahblah    ACTIVE     Vehicles            5000        NULL         NULL       2024/9/1    2024/9/1          2024/9/1       2024/9/1
+AUC#12786752    #AUCPROFILE#     DGW Auction 2025    blahblah    ACTIVE     SparePart           2000        NULL         NULL       2024/9/1    2024/9/1          2024/9/1       2024/9/1
+AUC#12786796    #AUCPROFILE#     DGW Auction 2026    blahblah    ACTIVE     Vehicles            3000        NULL         NULL       2024/9/1    2024/9/1          2024/9/1       2024/9/1
+
+
+Access Patterns:
+
+1. Create Update Auction 
+
+  ( Query: PK = #AUC#<AuctionID> and SK=#AUCPROFILE# ) 
+
+2. Get Auction
+
+    Query: PK = #AUC#<AuctionID> and SK=#AUCPROFILE#
+
+    (Fetch auction details for a specific auction)
+
+3. search auction by Status
+   
+    GSI
+
+    PK(GSI-1)          SK(SK)
+
+    Active        #AUCPROFILE#
+
+    Query: PK = Active AND  SK= '#AUCPROFILE#'
+
+
+3. search auction by Category
+
+    GSI
+
+    PK(GSI-2)        SK
+
+    Vehicles        #AUCPROFILE#
+
+    Query: PK = Vehicles and SK=#AUCPROFILE#
+
+
+4. Fetch near ending Auctions
+
+    GSI
+
+    PK(SK)             SK (EndDate)
+
+    #AUCPROFILE#       2024/10/09
+
+    Query: PK = #AUCPROFILE# and SK (EndDate) between two dates
+
+
+
+Bids
+
+
+PK                         SK                         CreateAt    UserID  Title(UserName)    Amount     bidid    auctionid                     
+
+AUC#12786786     BID#USR#amjad@yahoo.com#51152      2024/9/1        USR#amjad@yahoo.com       sdsds        50      525    1122       
+AUC#12786786     BID#USR#amjad@yahoo.com#51152      2024/9/1        USR#amjad@yahoo.com       sdsd         60      12     2122       
+
+
+
+
+Access Patterns:
+
+1. Create Bid
+
+     ( Query: PK = AUC#<AuctionID> and SK=BID#USR#amjad@yahoo.com#51152 ) 
+
+
+
+2. Get bids for a  auction
+
+    Query: PK = AUC#<AuctionID> AND  SK <= BID#)
+
+    (Retrieve all bids associated with a specific auction, sorted by CreatedOn)
+
+
+
+
+Payments:
+
+
+PK                        SK              UserID       PaymentID     Category(PaymentType)     Amount       CreatedOn      
+
+#AUC#12786786      USR#100Pay#121212       100          121212        Insurance                 5000        2024/9/1       
+#AUC#12786786      USR#100Pay#121281       100          121212        Settlement                2000        2024/9/1       
+
+
+Access Patterns:
+
+1. Add Payment
+
+2. Get Payments for a auction,
+
+    Query: PK = #AUC#<AuctionID> 
+
+3. Get a user payment details
+
+    Query: PK = #AUC#<AuctionID> and  SK (USR#100Pay#121212)
+
+
+3. Get User payments for a auction
+
+    Query: PK = #AUC#<AuctionID> and  SK begins with (USR#100Pay#)
+
+
+
+PaymentTransaction:
+
+
+PK                SK          CreatedOn       UserID         AuctionID        PaymentID   Category(PaymentType)  TransactionMethod  Amount    CreatedOn  UpdatedOn     Status        TTL (expire)
+
+#USR#100     PAYTRAN#12786786    2024/9/1         100         #AUC#12786786       121212      Insurance          CreditCard          5000        2024/9/1   2024/9/1     Completed
+#USR#100     PAYTRAN#12786786    2024/9/1         100         #AUC#12786786       121212      Settlement         CreditCard         2000        2024/9/1   2024/9/1     Pending
+
+
+
+Access Patterns:
+
+1. initiate payment tranaction ( add )
+
+
+2. Get Transaction
+
+    Query: PK = #USR#100 SK= PAYTRAN#12786786 
+
+3. update payment status (update)
+
+    Query: PK = #USR#100 SK= PAYTRAN#12786786 
+
+
+
+
+
+
+
+
+
+
+

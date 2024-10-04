@@ -1,0 +1,225 @@
+schema{
+    query:Query,
+    mutation: Mutation,
+    subscription: Subscription   
+}
+
+# Query
+
+type Query {
+  getUser(userId:String): UserResponse  
+  getAuction(auctionId: ID!): AuctionResponse
+  listAuctions(filter: TableAuctionFilterInput, limit: Int, nextToken: String): AuctionPage
+  getBids(auctionId: ID!):AuctionResponse  
+}
+
+
+type User {
+  userId: String!
+  userName: String! 
+  email:String  
+  mobileNo:String
+  status:UserStatus
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+type UserResponse {
+  statusCode: Int
+  message: String
+  result: User
+}
+
+enum UserStatus {
+  active
+  inactive 
+}
+
+type BidUser {
+  userId: String!
+  userName: String! 
+}
+
+enum AuctionStatus {
+  active
+  inactive 
+  pending
+  completed
+}
+
+enum AuctionCategory {
+  vehicles
+  scraps  
+}
+
+
+type Auction {
+  auctionId: ID!
+  auctionTitle:String!
+  description: String 
+  status: AuctionStatus!
+  category: AuctionCategory!
+  startingPrice: Float!
+  highestBid: Float
+  highestBidder: BidUser 
+  bids: [Bid]
+  auctionStartTimestamp: Float!
+  auctionEndTimestamp: Float!
+  createdAt: AWSDateTime
+  updatedAt: AWSDateTime
+}
+
+
+type Bid {
+  auctionId: ID!
+  bidId: ID! 
+  bidAmount: Float!
+  bidBy: BidUser! 
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime
+}
+
+
+
+type BidResponse {
+  statusCode: Int
+  message: String
+  result: Bid
+}
+
+
+type AuctionPage {
+  statusCode: Int
+  message: String
+  auctions: [Auction]
+  nextToken: String
+}
+
+
+
+input TableAuctionFilterInput {
+  auctionId: TableIDFilterInput
+  auctionTitle: TableStringFilterInput
+  description: TableStringFilterInput
+  startingPrice: TableFloatFilterInput
+  highestBid: TableFloatFilterInput  
+  highestBidder: BidUserInput
+  status:TableStatusFilterInput
+  auctionStartTimestamp: TableFloatFilterInput
+  auctionEndTimestamp: TableFloatFilterInput
+  createdAt: TableAWSDateTimeFilterInput
+  updatedAt: TableAWSDateTimeFilterInput
+}
+
+input TableBidFilterInput {
+  auctionId: TableIDFilterInput
+  bidtimestamp: TableAWSDateTimeFilterInput
+  bidid: TableIDFilterInput  
+  amount: TableFloatFilterInput
+  bidder: BidUserInput   
+}
+
+
+
+input TableIDFilterInput {
+  eq: ID
+}
+
+input TableStringFilterInput {
+  eq: String
+  contains: String
+}
+
+
+input TableStatusFilterInput {
+  eq: AuctionStatus
+}
+
+
+input TableFloatFilterInput {
+  eq: Float
+  gt: Float
+  lt: Float
+}
+
+input TableAWSDateTimeFilterInput {
+  eq: AWSDateTime
+  gt: AWSDateTime
+  lt: AWSDateTime
+}
+
+
+# Mutation 
+
+type Mutation {
+  addUser(input: AddUserInput!): UserResponse @aws_auth(cognito_groups:["Admin"])
+  createAuction(input: CreateAuctionInput!): AuctionResponse @aws_auth(cognito_groups:["Admin"])
+  updateAuction(auctionId: ID!,input: UpdateAuctionInput!): AuctionResponse @aws_auth(cognito_groups:["Admin"])
+  deleteAuction(auctionId: ID!): AuctionResponse @aws_auth(cognito_groups:["Admin"])
+  createBid(input: CreateBidInput!): BidResponse 
+  deleteBid(bidId: ID!): BidResponse
+}
+
+
+input AddUserInput {
+  userId: String!
+  userName: String!
+  email: String!  
+  mobileNo: String!
+  status: UserStatus!  
+}
+
+
+input CreateAuctionInput {
+  auctionTitle: String!
+  description: String 
+  category:AuctionCategory! 
+  startingPrice: Float!
+  status: AuctionStatus!
+  auctionStartTimestamp: Float!
+  auctionEndTimestamp: Float!
+}
+
+type AuctionResponse {
+  statusCode: Int
+  message: String
+  result: Auction
+}
+
+input UpdateAuctionInput {
+  auctionTitle: String
+  description: String
+  startingPrice: Float
+  highestBid: Float  
+  highestBidder: BidUserInput
+  status: AuctionStatus
+  auctionStartTimestamp: Float
+  auctionEndTimestamp: Float
+}
+
+input BidUserInput {
+  userId: String!
+  userName: String!
+}
+
+input CreateBidInput {
+  auctionId: ID!  
+  bidAmount:Float!
+  bidBy: BidUserInput!  
+}
+
+
+# Subscriptions
+
+type Subscription {
+  onCreateAuction: AuctionResponse
+    @aws_subscribe(mutations: ["createAuction"])
+  onUpdateAuction: AuctionResponse
+    @aws_subscribe(mutations: ["updateAuction"])
+  onDeleteAuction: AuctionResponse
+    @aws_subscribe(mutations: ["deleteAuction"])
+  onCreateBid: BidResponse
+    @aws_subscribe(mutations: ["createBid"]) 
+  onDeleteBid: BidResponse
+    @aws_subscribe(mutations: ["deleteBid"])
+}

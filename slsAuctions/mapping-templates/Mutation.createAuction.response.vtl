@@ -1,0 +1,17 @@
+{
+      "statusCode": 200,
+      "message": "Success",
+      "result": {
+        "auctionId": $util.toJson($ctx.result.auctionId),
+        "auctionTitle": $util.toJson($ctx.result.title),
+        "description": $util.toJson($ctx.result.description),
+        "status": $util.toJson($ctx.result.gsi-1),
+        "category": $util.toJson($ctx.result.gsi-2),
+        "startingPrice": $util.toJson($ctx.result.startingPrice),        
+        "auctionStartTimestamp":$util.toJson($ctx.result.auctionStartTimestamp),
+        "auctionEndTimestamp":$util.toJson($ctx.result.gsi-3),
+        "createdAt": $util.toJson($ctx.result.createdAt),
+        "updatedAt": $util.toJson($ctx.result.updatedAt)
+    }
+
+}

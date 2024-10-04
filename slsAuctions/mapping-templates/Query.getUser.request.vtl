@@ -1,0 +1,13 @@
+#set($pkPrefix = "USR#")
+#set($pk = $ctx.args.userId)
+#set($prefixedPk = "$pkPrefix$pk")
+#set($sk = "#USRPROFILE#")
+{
+    "version" : "2017-02-28",
+    "operation" : "GetItem",
+    "key" : {
+        "pk" : $util.dynamodb.toDynamoDBJson($prefixedPk),
+        "sk" : $util.dynamodb.toDynamoDBJson($sk)   
+    }
+    
+}

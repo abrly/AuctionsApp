@@ -1,0 +1,105 @@
+
+Resources:
+
+  # cognito user pool
+
+  cognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UsernameAttributes:
+        - email
+      UserPoolName: "AuctionsAppUserPool"
+
+  #cognito userpool client
+
+  cognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: web
+      UserPoolId: !Ref cognitoUserPool
+
+  #cognitoAdminGroup
+
+  cognitoAdminGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      Description: "Admin Group"
+      GroupName: "Admin"
+      Precedence: 0
+      RoleArn: !GetAtt cognitoAdminIAMRole.Arn
+      UserPoolId: !Ref cognitoUserPool
+
+  #cognitoAdmin IAM Role
+
+  cognitoAdminIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated:
+                - "cognito-identity.amazonaws.com"
+            Action:
+              - "sts:AssumeRoleWithWebIdentity"
+            Condition:
+              ForAnyValue:StringLike:
+                "cognito-identity.amazonaws.com:amr": "authenticated"
+
+      Description: "Cognito Admin IAM Role"
+      Policies:
+        - PolicyName: "auctions-admin-policy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "dynamodb:*"
+                Resource:
+                  - !GetAtt xAuctionsTable.Arn                
+            
+      RoleName: "auctions-admin-role"
+
+  #cognitoUserGroup
+
+  cognitoCustomerGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      Description: "User Group"
+      GroupName: "User"
+      Precedence: 1
+      RoleArn: !GetAtt cognitoUserIAMRole.Arn
+      UserPoolId: !Ref cognitoUserPool
+
+  #cognito User IAM Role
+
+  cognitoUserIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated:
+                - "cognito-identity.amazonaws.com"
+            Action:
+              - "sts:AssumeRoleWithWebIdentity"
+            Condition:
+              ForAnyValue:StringLike:
+                "cognito-identity.amazonaws.com:amr": "authenticated"
+
+      Description: "Cognito User IAM Role"
+      Policies:
+        - PolicyName: "auctions-user-policy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "dynamodb:*"
+                Resource:
+                  - !GetAtt xAuctionsTable.Arn   
+
+      RoleName: "auctions-customer-role"

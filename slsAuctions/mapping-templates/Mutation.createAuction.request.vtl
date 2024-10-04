@@ -1,0 +1,26 @@
+#set($pkPrefix = "AUC#")
+#set($pk = $util.autoId())
+#set($prefixedPk = "$pkPrefix$pk")
+#set($sk = "#AUCPROFILE#")
+#set($entityType = "Auction")
+{
+    "version" : "2017-02-28",
+    "operation" : "PutItem",
+    "key": {
+        "pk" : $util.dynamodb.toDynamoDBJson($prefixedPk),
+        "sk" : $util.dynamodb.toDynamoDBJson($sk)     
+    },
+    "attributeValues" : {
+        "entityType" : $util.dynamodb.toDynamoDBJson($entityType),
+        "auctionId"    : $util.dynamodb.toDynamoDBJson($pk),
+        "title"    : $util.dynamodb.toDynamoDBJson($ctx.args.input.auctionTitle),
+        "description" : $util.dynamodb.toDynamoDBJson($ctx.args.input.description), 
+        "gsi-1"    : $util.dynamodb.toDynamoDBJson($ctx.args.input.status), 
+        "gsi-2": $util.dynamodb.toDynamoDBJson($ctx.args.input.category), 
+        "startingPrice": $util.dynamodb.toDynamoDBJson($ctx.args.input.startingPrice),         
+        "auctionStartTimestamp" : $util.dynamodb.toDynamoDBJson($ctx.args.input.auctionStartTimestamp),
+        "gsi-3"    : $util.dynamodb.toDynamoDBJson($ctx.args.input.auctionEndTimestamp),
+        "createdAt" : $util.dynamodb.toDynamoDBJson($util.time.nowISO8601()),
+        "updatedAt" : $util.dynamodb.toDynamoDBJson($util.time.nowISO8601())
+    }
+}   

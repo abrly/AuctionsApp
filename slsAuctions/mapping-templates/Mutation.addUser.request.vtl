@@ -1,0 +1,23 @@
+#set($pkPrefix = "USR#")
+#set($pk = $ctx.args.input.userId)
+#set($prefixedPk = "$pkPrefix$pk")
+#set($sk = "#USRPROFILE#")
+#set($entityType = "User")
+{
+    "version" : "2017-02-28",
+    "operation" : "PutItem",
+    "key": {
+        "pk" : $util.dynamodb.toDynamoDBJson($prefixedPk),
+        "sk" : $util.dynamodb.toDynamoDBJson($sk)        
+    },
+    "attributeValues" : {
+        "entityType" : $util.dynamodb.toDynamoDBJson($entityType),
+        "userId"    : $util.dynamodb.toDynamoDBJson($ctx.args.input.userId),
+        "title"    : $util.dynamodb.toDynamoDBJson($ctx.args.input.userName),
+        "email" : $util.dynamodb.toDynamoDBJson($ctx.args.input.email), 
+        "mobileNo" : $util.dynamodb.toDynamoDBJson($ctx.args.input.mobileNo), 
+        "gsi-1"    : $util.dynamodb.toDynamoDBJson($ctx.args.input.status),     
+        "createdAt" : $util.dynamodb.toDynamoDBJson($util.time.nowISO8601()),
+        "updatedAt" : $util.dynamodb.toDynamoDBJson($util.time.nowISO8601())
+    }
+}

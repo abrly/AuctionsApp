@@ -1,0 +1,41 @@
+#if($ctx.result.items.size() == 0)
+    #return
+#end
+
+#set($auctionProfile = {})
+#set($bids = [])
+
+#foreach($item in $ctx.result.items)
+    #if($item["entityType"] == "Auction")
+        #set ($auctionProfile = $item)
+    #elseif($item["entityType"] == "Bid")
+        $util.qr($bids.add({
+            "auctionId": $item.auctionId,
+            "bidId": $item.bidId,
+            "bidAmount": $item.amount,
+            "bidBy": {
+                "userId": $item.userId,
+                "userName": $item.title
+            },
+            "createdAt": $item.createdAt
+        }))
+    #end
+#end
+
+{
+  "statusCode": 200,
+  "message": "Success",
+   "result": {
+        "auctionId": $util.toJson($auctionProfile.auctionId),
+        "auctionTitle": $util.toJson($auctionProfile.title),
+        "description": $util.toJson($auctionProfile.description),
+        "status": $util.toJson($auctionProfile.gsi-1),
+        "category": $util.toJson($auctionProfile.gsi-2),
+        "startingPrice": $util.toJson($auctionProfile.startingPrice),
+        "auctionStartTimestamp": $util.toJson($auctionProfile.auctionStartTimestamp),
+        "auctionEndTimestamp": $util.toJson($auctionProfile.gsi-3),
+        "bids": $util.toJson($bids),  ## Will be empty if no bids are present
+        "createdAt": $util.toJson($auctionProfile.createdAt),
+        "updatedAt": $util.toJson($auctionProfile.updatedAt)
+    }
+}

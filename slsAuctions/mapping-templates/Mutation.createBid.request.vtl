@@ -1,0 +1,28 @@
+#set($pkPrefix = "AUC#")
+#set($pkPostfix = $ctx.args.input.auctionId)
+#set($pk = "$pkPrefix$pkPostfix")
+#set($skPrefixUsrID = "BID#USR#")
+#set($skPostfixUsrID = $ctx.args.input.bidBy.userId)
+#set($skUsrID = "$skPrefixUsrID$skPostfixUsrID")
+#set($skPrefix = "#BIDID#")
+#set($skPostfix = $util.autoId())
+#set($sk = "$skUsrID$skPrefix$skPostfix")
+#set($entityType = "Bid")
+{
+    "version" : "2017-02-28",
+    "operation" : "PutItem",
+    "key": {
+        "pk" : $util.dynamodb.toDynamoDBJson($pk),
+        "sk" : $util.dynamodb.toDynamoDBJson($sk)        
+    },
+    "attributeValues" : {
+        "entityType" : $util.dynamodb.toDynamoDBJson($entityType),
+        "auctionId"    : $util.dynamodb.toDynamoDBJson($ctx.args.input.auctionId),
+        "bidId"    : $util.dynamodb.toDynamoDBJson($skPostfix),       
+        "userId"    : $util.dynamodb.toDynamoDBJson($ctx.args.input.bidBy.userId),
+        "title"  : $util.dynamodb.toDynamoDBJson($ctx.args.input.bidBy.userName),
+        "amount" : $util.dynamodb.toDynamoDBJson($ctx.args.input.bidAmount),        
+        "createdAt" : $util.dynamodb.toDynamoDBJson($util.time.nowISO8601()),
+        "updatedAt" : $util.dynamodb.toDynamoDBJson($util.time.nowISO8601())
+    }
+}  
